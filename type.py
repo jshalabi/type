@@ -27,6 +27,10 @@ def get_next_char():
 	return random.randint(33, num_chars - 1)
 
 def main():
+	# Number of character in queue
+	queue_size = 20 
+	queue = [get_next_char() for i in range(0, queue_size)]
+		
 	num_chars = 0
 	num_chars_right = 0
 	def percent_correct():
@@ -47,24 +51,22 @@ def main():
 				
 	result = "+"
 	stdscr = CursesSetup()
-	expected = get_next_char()
 	while(True):
 		stdscr.clear()
-		display = ''.join([result, "> '%c'" % (expected)])
+		chars = ''.join([str(chr(ch)) for ch in queue])
+		display = ''.join([result, "> ", chars])
 		stdscr.addstr(0, 0, display)
 		display = ''.join(["cpm: ", cpm(), " | ",
-					   "accuracy: ", percent_correct(), " | ",
-					   "ascii: %d" % (expected)])
+				   "accuracy: ", percent_correct(), " | ",
+				   "ascii: ", str(queue[0])])
 		stdscr.addstr(1, 0, display, curses.COLOR_GREEN)
 		stdscr.refresh()
 		actual = stdscr.getch()
-		if expected == actual:
+		if queue[0] == actual:
 			result = "+"
 			num_chars_right += 1
-			next_expected = get_next_char()
-			while next_expected == expected:
-				next_expected = get_next_char()
-			expected = next_expected
+			queue.append(get_next_char())
+			queue.pop(0)
 		else:
 			result = "-"
 		num_chars += 1
