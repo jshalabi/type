@@ -54,27 +54,59 @@ def cpm():
 
 def main():
     global num_chars, num_chars_right, start_time
-    stdscr = CursesSetup()
     result = "+"
+    stdscr = CursesSetup()
+
     # Initalize character queue
-    queue_size = 10
-    queue = [get_next_char() for i in range(0, queue_size)]
+    queue_len = 20
+    queue_height = 2
+    queues = []
+    for _ in range(queue_height):
+        queues.append([get_next_char() for i in range(0, queue_len)])
     while(True):
+        queue = queues[0]
+
         stdscr.clear()
-        chars = ''.join([str(chr(ch) + ' ') for ch in queue])
-        display = ''.join([result, "> ", chars])
-        stdscr.addstr(0, 0, display)
+
+        prefix = "".join([result, "> "])
+        stdscr.addstr(0, 0, prefix)
+
+        # Display current row
+        chars = ""
+        for _ in range(queue_len - len(queue)):
+            chars += "  "
+        for ch in queue:
+            chars += str(chr(ch)) + " "
+        stdscr.addstr(0, len(prefix), chars)
+
+        # Display the buffered rows
+        row = 0
+        for q in queues:
+            if not row == 0:
+                chars = ""
+                for ch in q:
+                    chars += str(chr(ch)) + " "
+                stdscr.addstr(row, len(prefix), chars)
+            row += 1
+
+        # Display stats
         display = ''.join(["cpm: ", cpm(), " | ",
                    "accuracy: ", percent_correct(), " | ",
                    "ascii: ", str(queue[0])])
-        stdscr.addstr(1, 0, display, curses.COLOR_GREEN)
+        stdscr.addstr(row + 1, 0, display)
         stdscr.refresh()
+
+        # Get user input
         actual = stdscr.getch()
+
+        # Update state
         if queue[0] == actual:
             result = "+"
             num_chars_right += 1
-            queue.append(get_next_char())
             queue.pop(0)
+            if len(queue) == 0:
+                queues.pop(0)
+                queues.append([get_next_char() for i in range(0, queue_len)])
         else:
             result = "-"
         num_chars += 1
