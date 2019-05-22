@@ -21,8 +21,18 @@ def SIGINT_Handler(signum, handler):
 signal.signal(signal.SIGINT, SIGINT_Handler)
 
 def get_next_char():
-        num_chars = 126
-        return random.randint(33, num_chars - 1)
+    valid_ascii = [\
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',\
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',\
+        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',\
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',\
+        'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',\
+        '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+',\
+        ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@',\
+        '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~',]
+
+    index = random.randint(0, len(valid_ascii) - 1)
+    return ord(valid_ascii[index])
 
 num_chars = 0
 num_chars_right = 0
@@ -47,11 +57,11 @@ def main():
     stdscr = CursesSetup()
     result = "+"
     # Initalize character queue
-    queue_size = 20
+    queue_size = 10
     queue = [get_next_char() for i in range(0, queue_size)]
     while(True):
         stdscr.clear()
-        chars = ''.join([str(chr(ch)) for ch in queue])
+        chars = ''.join([str(chr(ch) + ' ') for ch in queue])
         display = ''.join([result, "> ", chars])
         stdscr.addstr(0, 0, display)
         display = ''.join(["cpm: ", cpm(), " | ",
